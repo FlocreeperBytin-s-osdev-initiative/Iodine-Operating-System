@@ -16,222 +16,91 @@ The **Iodine Shell (`ish`)** is the primary interactive command line interface o
 
 ---
 
-## 2. Command Index
+## 2. Package Management (`apk` / `ipk`)
 
-### System Information & Diagnostics
+Iodine OS includes an Alpine `apk` clone for package management:
 
-#### `fetch` / `neofetch`
-Displays the colorful ASCII art Iodine OS badge alongside host specs, kernel version, uptime, memory utilization, and hardware date.
-```
-iodine:/home/user# fetch
-```
-
-#### `uname [-a]`
-Prints system and kernel information.
-```
-iodine:/home/user# uname -a
-IodineOS iodine-pc 1.0.0 #1 SMP PREEMPT 2026 i386 Iodine
-```
-
-#### `uptime`
-Reports how long the system has been running in hours, minutes, seconds, and total timer ticks.
-```
-iodine:/home/user# uptime
-Uptime: 00:04:12 (Total Ticks: 25200)
-```
-
-#### `date`
-Queries the hardware CMOS Real Time Clock and prints the UTC date and time.
-```
-iodine:/home/user# date
-2026-09-25 21:00:00 UTC
-```
-
-#### `mem` / `free`
-Displays detailed memory usage for physical RAM blocks and dynamic kernel heap, complete with an ASCII bar graph.
-```
-iodine:/home/user# mem
-```
-
-#### `dmesg`
-Dumps the kernel boot message log buffer.
-```
-iodine:/home/user# dmesg
+```bash
+apk update             # Update repository indexes
+apk list               # List all available and installed packages
+apk info [package]     # Show package details, license, and file list
+apk add <package>      # Install package into Iodine OS VFS
+apk del <package>      # Uninstall package from system
+apk search <keyword>   # Search repository catalog
+apk upgrade            # Upgrade installed packages
 ```
 
 ---
 
-### Process & Task Management
+## 3. BSD Utilities (`bsdutils`)
 
-#### `ps`
-Lists all active processes, displaying PID, name, state (`READY`, `RUNNING`, `SLEEPING`, `ZOMBIE`), priority, and CPU runtime ticks.
-```
-iodine:/home/user# ps
-```
+Classic BSD core utilities integrated into Iodine OS:
 
-#### `top`
-Interactive dynamic real-time system monitor. Automatically refreshes every second showing CPU time, uptime, memory, and process states. Press any key (or `q`) to exit back to the shell.
-```
-iodine:/home/user# top
-```
-
-#### `kill <pid>`
-Terminates a process by its process ID.
-```
-iodine:/home/user# kill 3
-```
-
-#### `sleep <seconds>`
-Suspends execution for the specified number of seconds using timer interrupts.
-```
-iodine:/home/user# sleep 2
+```bash
+cal [month] [year]     # Display BSD monthly calendar
+hexdump -C <file>      # Canonical BSD hexadecimal + ASCII dump
+column [words...]      # Format items into aligned columns
+banner [text...]       # Print large retro ASCII billboard banner
+morse [text...]        # Encode text into Morse code
+cksum <file...>        # Compute POSIX / BSD 32-bit CRC checksum
+whoami                 # Display current effective user (root)
 ```
 
 ---
 
-### File & Directory Management
+## 4. Subsystem & Driver Controls
 
-#### `ls [-l] [path]`
-Lists files and directories. Supports `-l` for detailed view with file types, permissions, and sizes.
-```
-iodine:/home/user# ls -l
--rw-r--r--    479  welcome.txt
--rw-r--r--    104  notes.txt
-```
-
-#### `cd <path>`
-Changes current working directory. Supports `..`, `/`, `~`, and relative paths.
-```
-iodine:/home/user# cd /etc
-iodine:/etc# cd ..
-iodine:/#
-```
-
-#### `pwd`
-Prints the current working directory path.
-```
-iodine:/home/user# pwd
-/home/user
-```
-
-#### `cat <path>`
-Reads and outputs the contents of a file to the screen.
-```
-iodine:/home/user# cat /etc/version
-Iodine Operating System 1.0.0 (Release 2026)
-```
-
-#### `touch <path>`
-Creates a new empty file in the filesystem.
-```
-iodine:/home/user# touch myfile.txt
-```
-
-#### `write <path> <text...>`
-Writes text directly into a file.
-```
-iodine:/home/user# write notes.txt System is running flawlessly!
-```
-
-#### `mkdir <path>`
-Creates a new directory in the filesystem.
-```
-iodine:/home/user# mkdir projects
-```
-
-#### `rm <path>`
-Removes a file or empty directory from the filesystem.
-```
-iodine:/home/user# rm oldfile.txt
-```
-
-#### `hexdump <path>`
-Displays a canonical hexadecimal and ASCII byte dump of any file.
-```
-iodine:/home/user# hexdump /etc/hostname
-```
-
-#### `wc <path>`
-Counts the lines, words, and characters of a text file.
-```
-iodine:/home/user# wc welcome.txt
+```bash
+posix                  # Verify POSIX open, write, read, stat, lseek, brk
+musl                   # Verify musl libc compatibility and Linux syscall translation
+virtio                 # Probe and display VirtIO hardware devices on PCI bus
+ldk [status|start|stop]# Manage Linux Driver Sandbox (GPL Contamination Barrier)
 ```
 
 ---
 
-### Applications & Games
+## 5. System Information & Diagnostics
 
-#### `snake`
-Launches the full-featured retro arcade Snake game on the VGA text console!
-- Controls: `W`, `A`, `S`, `D` or Arrow Keys.
-- Objective: Eat `*` to grow and increase score.
-- Sound effects via PC speaker.
-- Press `Q` to quit.
-```
-iodine:/home/user# snake
-```
-
-#### `edit <path>`
-Launches the full-screen visual text editor ("Iodine Edit"):
-- Nano-style visual interface with top status bar and bottom shortcut bar.
-- Arrow keys for cursor navigation.
-- `Ctrl + S`: Save file to VFS.
-- `Ctrl + Q`: Exit editor.
-```
-iodine:/home/user# edit mydocument.txt
-```
-
-#### `matrix`
-Displays an animated green digital rain Matrix screen saver effect.
-Press any key to return to the shell.
-```
-iodine:/home/user# matrix
-```
-
-#### `calc <expression>`
-Evaluates mathematical expressions with operator precedence and parentheses.
-Supported operators: `+`, `-`, `*`, `/`, `%`, `(`, `)`.
-```
-iodine:/home/user# calc (15 + 35) * 4
-(15 + 35) * 4 = 200
+```bash
+fetch / neofetch       # Display ASCII art system banner & specifications
+uname [-a]             # Print kernel version and host machine name
+uptime                 # Show system running time and total ticks
+date                   # Read hardware RTC date and time
+mem / free             # RAM and heap utilization with ASCII bar
+ps                     # Snapshot of active processes and threads
+top                    # Interactive dynamic real-time task monitor
+dmesg                  # Dump kernel boot message buffer
+reboot                 # Soft reboot via 8042 keyboard controller
+shutdown               # Power off machine via ACPI/APM
 ```
 
 ---
 
-### Hardware, Audio & Display
+## 6. Filesystem Operations
 
-#### `beep [frequency] [duration_ms]`
-Generates an acoustic audio tone through the PC speaker.
-```
-iodine:/home/user# beep 440 300
-```
-
-#### `melody`
-Plays a classic 8-bit fanfare musical theme on the PC speaker!
-```
-iodine:/home/user# melody
-```
-
-#### `color <fg> [bg]`
-Changes console foreground and background colors (0-15 VGA palette).
-```
-iodine:/home/user# color 10 0
+```bash
+ls [-l] [path]         # List directory contents
+cd <path>              # Change working directory (.., ~, /)
+pwd                    # Print current working directory
+cat <path>             # Output file contents
+touch <path>           # Create empty file
+write <path> <text...> # Write string directly into file
+mkdir <path>           # Create new directory
+rm <path>              # Remove file or empty directory
+wc <path>              # Count lines, words, and characters
 ```
 
-#### `clear`
-Clears the console display and resets cursor to top-left.
-```
-iodine:/home/user# clear
-```
+---
 
-#### `reboot`
-Safely reboots the computer via the 8042 keyboard controller reset line.
-```
-iodine:/home/user# reboot
-```
+## 7. Applications & Audio
 
-#### `shutdown`
-Powers down the computer via ACPI / APM hardware power ports.
-```
-iodine:/home/user# shutdown
+```bash
+snake                  # Play retro arcade Snake game (WASD / Arrow keys)
+edit <path>            # Full-screen Nano-style visual text editor (^S save, ^Q quit)
+matrix                 # Digital green Matrix rain screensaver
+calc <expression>      # Math expression solver: (15 + 35) * 4
+beep [freq] [duration] # Acoustic tone via PC speaker
+melody                 # Play 8-bit fanfare theme on PC speaker
+color <fg> [bg]        # Change console color palette
+clear                  # Clear console screen
 ```

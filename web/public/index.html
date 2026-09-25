@@ -426,13 +426,17 @@
                 <button class="btn btn-cyan" onclick="sendCmd('fetch\n')">fetch</button>
                 <button class="btn btn-green" onclick="sendCmd('snake\n')">snake</button>
                 <button class="btn btn-green" onclick="sendCmd('matrix\n')">matrix</button>
+                <button class="btn btn-cyan" onclick="sendCmd('apk list\n')">apk list</button>
+                <button class="btn btn-cyan" onclick="sendCmd('posix\n')">posix</button>
+                <button class="btn btn-cyan" onclick="sendCmd('musl\n')">musl</button>
+                <button class="btn" onclick="sendCmd('virtio\n')">virtio</button>
+                <button class="btn" onclick="sendCmd('ldk\n')">ldk</button>
+                <button class="btn" onclick="sendCmd('cal\n')">cal</button>
+                <button class="btn" onclick="sendCmd('banner IODINE\n')">banner</button>
                 <button class="btn" onclick="sendCmd('help\n')">help</button>
                 <button class="btn" onclick="sendCmd('ls -l\n')">ls -l</button>
                 <button class="btn" onclick="sendCmd('mem\n')">mem</button>
                 <button class="btn" onclick="sendCmd('ps\n')">ps</button>
-                <button class="btn" onclick="sendCmd('date\n')">date</button>
-                <button class="btn" onclick="sendCmd('calc (12 + 8) * 5\n')">calc</button>
-                <button class="btn" onclick="sendCmd('melody\n')">melody</button>
                 <button class="btn" onclick="sendCmd('top\n')">top</button>
                 <button class="btn btn-red" onclick="restartEmulator()">Reboot OS</button>
             </div>
@@ -491,7 +495,11 @@
                     </a>
                     <a href="/disk/iodine.elf" download="iodine.elf" class="download-btn">
                         <span>&#x2699;&#xFE0F; Multiboot Kernel (.elf)</span>
-                        <span class="download-size">67 KB</span>
+                        <span class="download-size">91 KB</span>
+                    </a>
+                    <a href="/disk/iodine64.elf" download="iodine64.elf" class="download-btn">
+                        <span>&#x2699;&#xFE0F; 64-bit Kernel (.elf)</span>
+                        <span class="download-size">x86_64</span>
                     </a>
                 </div>
             </div>
@@ -500,17 +508,21 @@
                 <div class="card-title">Shell Command Index</div>
                 <table class="cmd-table">
                     <tr><td class="cmd-name">help</td><td class="cmd-desc">List all commands</td></tr>
+                    <tr><td class="cmd-name">apk / ipk</td><td class="cmd-desc">Alpine apk package manager</td></tr>
+                    <tr><td class="cmd-name">posix</td><td class="cmd-desc">POSIX subsystem test</td></tr>
+                    <tr><td class="cmd-name">musl</td><td class="cmd-desc">musl libc syscall layer</td></tr>
+                    <tr><td class="cmd-name">virtio</td><td class="cmd-desc">VirtIO device bus probe</td></tr>
+                    <tr><td class="cmd-name">ldk</td><td class="cmd-desc">Linux Driver Sandbox</td></tr>
+                    <tr><td class="cmd-name">cal / hexdump</td><td class="cmd-desc">BSD calendar &amp; hex dump</td></tr>
+                    <tr><td class="cmd-name">banner / morse</td><td class="cmd-desc">BSD banner &amp; morse code</td></tr>
+                    <tr><td class="cmd-name">cksum / whoami</td><td class="cmd-desc">BSD cksum &amp; identity</td></tr>
                     <tr><td class="cmd-name">fetch</td><td class="cmd-desc">System info badge</td></tr>
                     <tr><td class="cmd-name">snake</td><td class="cmd-desc">Play arcade Snake</td></tr>
                     <tr><td class="cmd-name">matrix</td><td class="cmd-desc">Digital green rain</td></tr>
                     <tr><td class="cmd-name">edit</td><td class="cmd-desc">Visual text editor</td></tr>
                     <tr><td class="cmd-name">calc</td><td class="cmd-desc">Math calculator</td></tr>
-                    <tr><td class="cmd-name">ls / cd</td><td class="cmd-desc">Browse filesystem</td></tr>
-                    <tr><td class="cmd-name">cat / write</td><td class="cmd-desc">Read/write files</td></tr>
-                    <tr><td class="cmd-name">mem / free</td><td class="cmd-desc">RAM and heap stats</td></tr>
-                    <tr><td class="cmd-name">ps / top</td><td class="cmd-desc">Process monitoring</td></tr>
-                    <tr><td class="cmd-name">melody / beep</td><td class="cmd-desc">PC speaker sounds</td></tr>
-                    <tr><td class="cmd-name">date / uptime</td><td class="cmd-desc">Hardware RTC clock</td></tr>
+                    <tr><td class="cmd-name">ls / cd / cat</td><td class="cmd-desc">Browse &amp; read files</td></tr>
+                    <tr><td class="cmd-name">mem / ps / top</td><td class="cmd-desc">Memory &amp; task monitoring</td></tr>
                 </table>
             </div>
         </aside>

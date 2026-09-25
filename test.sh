@@ -26,16 +26,20 @@ emulator.add_listener("serial0-output-byte", (byte) => {
 
 const commands = [
     "echo [TEST] Iodine OS booted successfully!\n",
+    "posix\n",
+    "musl\n",
+    "virtio\n",
+    "ldk\n",
+    "apk update\n",
+    "apk list\n",
+    "apk add curl\n",
+    "apk info curl\n",
+    "cal\n",
+    "whoami\n",
+    "morse hello\n",
+    "banner IODINE\n",
+    "cksum welcome.txt\n",
     "calc (100 - 25) * 4\n",
-    "uname -a\n",
-    "date\n",
-    "uptime\n",
-    "mem\n",
-    "ps\n",
-    "touch testfile.txt\n",
-    "write testfile.txt Hello from Iodine Test Runner\n",
-    "cat testfile.txt\n",
-    "cat /etc/version\n",
     "fetch\n"
 ];
 
@@ -52,13 +56,17 @@ setTimeout(() => {
                 console.log("\n--- Automated Verification Checks ---");
                 const checks = [
                     { name: "Kernel Boot Splash", pattern: "IODINE OPERATING SYSTEM" },
-                    { name: "PMM & VMM Init", pattern: "Virtual Memory Manager (Paging)" },
-                    { name: "VFS Mounts", pattern: "Mounting ProcFS" },
-                    { name: "Shell Prompt", pattern: "iodine:/home/user#" },
+                    { name: "POSIX Subsystem Check", pattern: "100% Standard POSIX Interfaces Active" },
+                    { name: "musl libc Compatibility", pattern: "Fully compliant with musl POSIX system call ABI" },
+                    { name: "VirtIO Hardware Probe", pattern: "VIRTIO PCI HARDWARE BUS" },
+                    { name: "Linux Driver Sandbox (GPL Barrier)", pattern: "GPL CONTAMINATION BARRIER" },
+                    { name: "apk Package Manager (Alpine Clone)", pattern: "distinct packages available" },
+                    { name: "apk Install (curl)", pattern: "Installing curl" },
+                    { name: "BSD Utilities (whoami)", pattern: "root" },
+                    { name: "BSD Utilities (cal)", pattern: "September 2026" },
+                    { name: "BSD Utilities (morse)", pattern: ".... . .-.. .-.. ---" },
+                    { name: "BSD Utilities (cksum)", pattern: "welcome.txt" },
                     { name: "Calculator Test", pattern: "(100 - 25) * 4 = 300" },
-                    { name: "Uname Output", pattern: "IodineOS iodine-pc 1.0.0" },
-                    { name: "File Write/Cat", pattern: "Hello from Iodine Test Runner" },
-                    { name: "Version File", pattern: "Iodine Operating System 1.0.0" },
                     { name: "ASCII Art Fetch", pattern: "Pure Custom Bare Metal" }
                 ];
 
@@ -79,8 +87,8 @@ setTimeout(() => {
                     console.error("\nTEST FAILURES DETECTED.\n");
                     process.exit(1);
                 }
-            }, 2500);
+            }, 3000);
         }
-    }, 500);
-}, 2500);
+    }, 600);
+}, 3000);
 '

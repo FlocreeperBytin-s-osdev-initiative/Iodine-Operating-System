@@ -64,6 +64,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
             p++;
         }
 
+        // Length modifiers (l, ll)
+        int is_long = 0;
+        if (*p == 'l') {
+            is_long++;
+            p++;
+            if (*p == 'l') {
+                is_long++;
+                p++;
+            }
+        }
+
         // Specifier
         char spec = *p++;
         char tmp[64];
@@ -87,15 +98,36 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
             }
             case 'd':
             case 'i': {
-                int val = va_arg(ap, int);
-                itoa(val, tmp, 10);
+                if (is_long >= 2) {
+                    long long val = va_arg(ap, long long);
+                    if (val < 0) {
+                        tmp[0] = '-';
+                        uitoa((unsigned long long)-val, tmp + 1, 10);
+                    } else {
+                        uitoa((unsigned long long)val, tmp, 10);
+                    }
+                } else if (is_long == 1) {
+                    long val = va_arg(ap, long);
+                    itoa(val, tmp, 10);
+                } else {
+                    int val = va_arg(ap, int);
+                    itoa(val, tmp, 10);
+                }
                 arg_str = tmp;
                 arg_len = strlen(arg_str);
                 break;
             }
             case 'u': {
-                unsigned int val = va_arg(ap, unsigned int);
-                uitoa(val, tmp, 10);
+                if (is_long >= 2) {
+                    unsigned long long val = va_arg(ap, unsigned long long);
+                    uitoa(val, tmp, 10);
+                } else if (is_long == 1) {
+                    unsigned long val = va_arg(ap, unsigned long);
+                    uitoa(val, tmp, 10);
+                } else {
+                    unsigned int val = va_arg(ap, unsigned int);
+                    uitoa(val, tmp, 10);
+                }
                 arg_str = tmp;
                 arg_len = strlen(arg_str);
                 break;

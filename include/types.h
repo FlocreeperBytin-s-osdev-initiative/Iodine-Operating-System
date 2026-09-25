@@ -11,11 +11,19 @@ typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 
+#ifdef __x86_64__
+typedef uint64_t           size_t;
+typedef int64_t            ssize_t;
+typedef uint64_t           uintptr_t;
+typedef int64_t            intptr_t;
+#else
 typedef uint32_t           size_t;
 typedef int32_t            ssize_t;
-typedef int32_t            pid_t;
 typedef uint32_t           uintptr_t;
 typedef int32_t            intptr_t;
+#endif
+
+typedef int32_t            pid_t;
 
 #define NULL ((void *)0)
 

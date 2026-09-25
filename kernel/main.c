@@ -19,6 +19,13 @@
 #include "../fs/ramfs.h"
 #include "../fs/devfs.h"
 #include "../fs/procfs.h"
+#include "../compat/posix/posix.h"
+#include "../compat/linux/linux_sys.h"
+#include "../compat/musl/musl_compat.h"
+#include "../compat/linux_driver_sandbox/ldk.h"
+#include "../drivers/virtio/virtio.h"
+#include "../drivers/virtio/virtio_blk.h"
+#include "../drivers/virtio/virtio_net.h"
 #include "process.h"
 #include "sched.h"
 #include "syscall.h"
@@ -99,11 +106,32 @@ void kernel_main(uint32_t magic, multiboot_info_t *mboot_info) {
     vfs_node_t *proc_fs = procfs_init();
     vfs_mount("/proc", proc_fs);
 
-    // 13. System Calls
+    // 13. POSIX, Linux Translator & musl Compatibility
+    printf("[BOOT] Initializing POSIX Subsystem & File Descriptors...\n");
+    posix_init();
+
+    printf("[BOOT] Initializing Linux Syscall Translation Layer...\n");
+    linux_translator_init();
+
+    printf("[BOOT] Initializing musl libc Compatibility Runtime...\n");
+    musl_compat_init();
+
+    // 14. VirtIO Hardware Subsystem
+    printf("[BOOT] Scanning PCI bus for VirtIO Hardware Devices...\n");
+    virtio_init();
+    virtio_blk_init();
+    virtio_net_init();
+
+    // 15. Linux Driver Sandbox (LDK - GPL Isolation Barrier)
+    printf("[BOOT] Initializing Linux Driver Sandbox (LDK Domain)...\n");
+    ldk_sandbox_init();
+    ldk_sandbox_start();
+
+    // 16. System Calls
     printf("[BOOT] Registering System Call Gate (int 0x80)...\n");
     syscall_init();
 
-    // 14. Multitasking & Scheduler
+    // 17. Multitasking & Scheduler
     printf("[BOOT] Initializing Process Manager and Scheduler...\n");
     process_init();
     sched_init();
