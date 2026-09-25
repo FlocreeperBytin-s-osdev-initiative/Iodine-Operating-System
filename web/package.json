@@ -1,0 +1,10 @@
+{
+  "name": "iodine-os-preview",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "v86": "^0.5.462",
+    "v86-system": "^0.5.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iodine Operating System - Live x86 Emulator</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #151922;
+            --accent-cyan: #00e5ff;
+            --accent-purple: #9d4edd;
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --text-color: #e2e8f0;
+            --text-dim: #718096;
+            --border-color: #2d3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Header */
+        header {
+            background: linear-gradient(90deg, #121620 0%, #1a1f2c 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, #7928ca, #ff0080);
+            color: #fff;
+            font-weight: 900;
+            font-size: 18px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 15px rgba(121, 40, 202, 0.5);
+        }
+
+        .title-group h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .title-group p {
+            font-size: 12px;
+            color: var(--accent-cyan);
+            font-family: monospace;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--accent-green);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Screen Bezel & Monitor */
+        .emulator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .monitor-bezel {
+            background: #11141c;
+            border: 2px solid #232938;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.1);
+            position: relative;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: monospace;
+        }
+
+        .monitor-header-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .header-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .header-dot.red { background: #ff5f56; }
+        .header-dot.yellow { background: #ffbd2e; }
+        .header-dot.green { background: #27c93f; }
+
+        #screen_container {
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        #screen_container canvas {
+            display: block;
+            image-rendering: pixelated;
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        /* Quick Command Bar */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            align-items: center;
+        }
+
+        .action-bar-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+
+        .btn {
+            background: #202636;
+            color: #e2e8f0;
+            border: 1px solid #323b50;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-family: monospace;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #2d364d;
+            border-color: var(--accent-cyan);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-cyan {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: rgba(0, 229, 255, 0.4);
+            color: var(--accent-cyan);
+        }
+        .btn-cyan:hover {
+            background: rgba(0, 229, 255, 0.25);
+            color: #fff;
+        }
+
+        .btn-green {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: rgba(0, 255, 136, 0.4);
+            color: var(--accent-green);
+        }
+        .btn-green:hover {
+            background: rgba(0, 255, 136, 0.25);
+            color: #fff;
+        }
+
+        .btn-red {
+            background: rgba(255, 51, 102, 0.15);
+            border-color: rgba(255, 51, 102, 0.4);
+            color: var(--accent-red);
+        }
+        .btn-red:hover {
+            background: rgba(255, 51, 102, 0.25);
+            color: #fff;
+        }
+
+        /* Sidebar Panels */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .spec-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spec-label {
+            color: var(--text-dim);
+        }
+
+        .spec-value {
+            font-family: monospace;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Download Section */
+        .downloads-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .download-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #1b212f;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-family: monospace;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #252e42;
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .download-size {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Architecture Section */
+        .feature-tag {
+            display: inline-block;
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            color: #c77dff;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-family: monospace;
+        }
+
+        /* Help table */
+        .cmd-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .cmd-table td {
+            padding: 4px 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .cmd-name {
+            font-family: monospace;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .cmd-desc {
+            color: var(--text-dim);
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 14px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            background: #0f131b;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-group">
+            <div class="logo-badge">IODINE</div>
+            <div class="title-group">
+                <h1>Iodine Operating System</h1>
+                <p>Pure x86_32 Monolithic Bare-Metal Kernel &bull; Custom OS</p>
+            </div>
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>RUNNING &bull; BARE METAL</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="emulator-container">
+            <div class="monitor-bezel">
+                <div class="monitor-header">
+                    <div class="monitor-header-dots">
+                        <div class="header-dot red"></div>
+                        <div class="header-dot yellow"></div>
+                        <div class="header-dot green"></div>
+                    </div>
+                    <span>VGA 80x25 TEXT DISPLAY &bull; 720x400 @ 70Hz</span>
+                    <span id="fps_counter">100 Ticks/sec</span>
+                </div>
+
+                <!-- v86 Canvas Container -->
+                <div id="screen_container">
+                    <canvas id="v86_canvas" width="640" height="400"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Action Command Toolbar -->
+            <div class="action-bar">
+                <span class="action-bar-label">Send Input:</span>
+                <button class="btn btn-cyan" onclick="sendCmd('fetch\n')">fetch</button>
+                <button class="btn btn-green" onclick="sendCmd('snake\n')">snake</button>
+                <button class="btn btn-green" onclick="sendCmd('matrix\n')">matrix</button>
+                <button class="btn btn-cyan" onclick="sendCmd('apk list\n')">apk list</button>
+                <button class="btn btn-cyan" onclick="sendCmd('posix\n')">posix</button>
+                <button class="btn btn-cyan" onclick="sendCmd('musl\n')">musl</button>
+                <button class="btn" onclick="sendCmd('virtio\n')">virtio</button>
+                <button class="btn" onclick="sendCmd('ldk\n')">ldk</button>
+                <button class="btn" onclick="sendCmd('cal\n')">cal</button>
+                <button class="btn" onclick="sendCmd('banner IODINE\n')">banner</button>
+                <button class="btn" onclick="sendCmd('help\n')">help</button>
+                <button class="btn" onclick="sendCmd('ls -l\n')">ls -l</button>
+                <button class="btn" onclick="sendCmd('mem\n')">mem</button>
+                <button class="btn" onclick="sendCmd('ps\n')">ps</button>
+                <button class="btn" onclick="sendCmd('top\n')">top</button>
+                <button class="btn btn-red" onclick="restartEmulator()">Reboot OS</button>
+            </div>
+        </div>
+
+        <!-- Sidebar Specifications & Downloads -->
+        <aside class="sidebar">
+            <div class="card">
+                <div class="card-title">System Architecture</div>
+                <div class="spec-list">
+                    <div class="spec-item">
+                        <span class="spec-label">Kernel Name</span>
+                        <span class="spec-value">Iodine Kernel</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Architecture</span>
+                        <span class="spec-value">x86_32 Protected</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Memory Model</span>
+                        <span class="spec-value">4GB Paged (VMM)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Physical RAM</span>
+                        <span class="spec-value">128 MB</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Kernel Heap</span>
+                        <span class="spec-value">16 MB Dynamic</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Multitasking</span>
+                        <span class="spec-value">Preemptive (PIT)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Interrupts</span>
+                        <span class="spec-value">IDT 256 / PIC 8259A</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Filesystems</span>
+                        <span class="spec-value">VFS, RamFS, DevFS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Bootable Downloads</div>
+                <div class="downloads-list">
+                    <a href="/disk/iodine.img" download="iodine.img" class="download-btn">
+                        <span>&#x1F4BE; Floppy Disk (.img)</span>
+                        <span class="download-size">1.44 MB</span>
+                    </a>
+                    <a href="/disk/iodine.iso" download="iodine.iso" class="download-btn">
+                        <span>&#x1F4BF; El Torito CD (.iso)</span>
+                        <span class="download-size">1.5 MB</span>
+                    </a>
+                    <a href="/disk/iodine.elf" download="iodine.elf" class="download-btn">
+                        <span>&#x2699;&#xFE0F; Multiboot Kernel (.elf)</span>
+                        <span class="download-size">91 KB</span>
+                    </a>
+                    <a href="/disk/iodine64.elf" download="iodine64.elf" class="download-btn">
+                        <span>&#x2699;&#xFE0F; 64-bit Kernel (.elf)</span>
+                        <span class="download-size">x86_64</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Shell Command Index</div>
+                <table class="cmd-table">
+                    <tr><td class="cmd-name">help</td><td class="cmd-desc">List all commands</td></tr>
+                    <tr><td class="cmd-name">apk / ipk</td><td class="cmd-desc">Alpine apk package manager</td></tr>
+                    <tr><td class="cmd-name">posix</td><td class="cmd-desc">POSIX subsystem test</td></tr>
+                    <tr><td class="cmd-name">musl</td><td class="cmd-desc">musl libc syscall layer</td></tr>
+                    <tr><td class="cmd-name">virtio</td><td class="cmd-desc">VirtIO device bus probe</td></tr>
+                    <tr><td class="cmd-name">ldk</td><td class="cmd-desc">Linux Driver Sandbox</td></tr>
+                    <tr><td class="cmd-name">cal / hexdump</td><td class="cmd-desc">BSD calendar &amp; hex dump</td></tr>
+                    <tr><td class="cmd-name">banner / morse</td><td class="cmd-desc">BSD banner &amp; morse code</td></tr>
+                    <tr><td class="cmd-name">cksum / whoami</td><td class="cmd-desc">BSD cksum &amp; identity</td></tr>
+                    <tr><td class="cmd-name">fetch</td><td class="cmd-desc">System info badge</td></tr>
+                    <tr><td class="cmd-name">snake</td><td class="cmd-desc">Play arcade Snake</td></tr>
+                    <tr><td class="cmd-name">matrix</td><td class="cmd-desc">Digital green rain</td></tr>
+                    <tr><td class="cmd-name">edit</td><td class="cmd-desc">Visual text editor</td></tr>
+                    <tr><td class="cmd-name">calc</td><td class="cmd-desc">Math calculator</td></tr>
+                    <tr><td class="cmd-name">ls / cd / cat</td><td class="cmd-desc">Browse &amp; read files</td></tr>
+                    <tr><td class="cmd-name">mem / ps / top</td><td class="cmd-desc">Memory &amp; task monitoring</td></tr>
+                </table>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        Iodine Operating System &bull; 100% From Scratch Bare Metal OS &bull; Built with GCC, Binutils &amp; Assembly
+    </footer>
+
+    <!-- v86 Emulator Script -->
+    <script src="/libv86.js"></script>
+    <script>
+        let emulator = null;
+
+        function startEmulator() {
+            if (emulator) {
+                emulator.destroy();
+            }
+
+            const screen_container = document.getElementById("screen_container");
+            screen_container.innerHTML = "";
+
+            emulator = new V86Starter({
+                wasm_path: "/v86.wasm",
+                memory_size: 128 * 1024 * 1024,
+                vga_memory_size: 8 * 1024 * 1024,
+                screen_container: screen_container,
+                bios: { url: "/seabios.bin" },
+                vga_bios: { url: "/vgabios.bin" },
+                fda: { url: "/iodine.img" },
+                boot_order: 0x01,
+                autostart: true
+            });
+
+            emulator.add_listener("emulator-ready", function() {
+                console.log("[Iodine OS] Emulator ready.");
+            });
+
+            // Focus screen on click
+            screen_container.addEventListener("click", () => {
+                screen_container.focus();
+            });
+        }
+
+        function sendCmd(text) {
+            if (emulator && emulator.serial0_send) {
+                emulator.serial0_send(text);
+            }
+        }
+
+        function restartEmulator() {
+            if (emulator) {
+                emulator.restart();
+            } else {
+                startEmulator();
+            }
+        }
+
+        window.addEventListener("load", () => {
+            startEmulator();
+        });
+    </script>
+</body>
+</html>
